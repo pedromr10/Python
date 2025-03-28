@@ -1,12 +1,40 @@
 #imports:
 import customtkinter
 import tkinter
-from pytube import YouTube
-
-#variaveis: 
-linkStr = tkinter.StringVar()
+from pytubefix import YouTube
 
 #funcoes:
+
+def baixarVideo(linkEntry):
+    try:
+        link = linkEntry.get()
+        ytb = YouTube(link)
+        video = ytb.streams.filter(adaptive=True, file_extension="mp4").order_by("resolution").desc().first()
+
+        if video:
+            video.download()
+            print(f"Baixando vídeo na resolução {video.resolution}...")
+            print("Download concluído!")
+        else:
+            print("Nenhum stream de vídeo encontrado.")
+
+    except Exception as e:
+        print("Erro ao baixar vídeo")
+
+def baixarAudio(linkEntry):
+    try:
+        link = linkEntry.get()
+        ytb = YouTube(link)
+        audio = ytb.streams.filter(only_audio=True).first()
+        if audio:
+            audio.download()
+            print("Download concluído!")
+        else:
+            print("Nenhum stream de áudio encontrado.")
+
+    except Exception as e:
+        print("Erro ao baixar vídeo")
+
 def funcaoSobre():
     #criacao do frame sobre:
     customtkinter.set_appearance_mode("System")
@@ -20,7 +48,7 @@ def funcaoSobre():
     autor = customtkinter.CTkLabel(paginaSobre, text = 'Autor:  Pedro Munhoz Rosin', text_color='white')
     autor.pack(padx = 10, pady = 10)
     
-    bibliotecas = customtkinter.CTkLabel(paginaSobre, text = 'Bibliotecas utilizadas:   customtkinter, pytube', text_color='white')
+    bibliotecas = customtkinter.CTkLabel(paginaSobre, text = 'Bibliotecas utilizadas:   customtkinter, pytubeFIX', text_color='white')
     bibliotecas.pack(padx = 10, pady = 10)
 
     funcionalidades = customtkinter.CTkLabel(paginaSobre, text = 'Funcionalidades:\n   - É possível baixar vídeos com a \nmaior qualidade disponível;\n- É possível baixar faixas de áudio.', text_color='white')
@@ -35,26 +63,24 @@ def funcaoBaixar():
     customtkinter.set_appearance_mode("System")
     customtkinter.set_default_color_theme("blue")
     paginaBaixar = customtkinter.CTk()
-    paginaBaixar.geometry("450x300")
+    paginaBaixar.geometry("350x200")
     paginaBaixar.configure(fg_color = '#a34957')
     paginaBaixar.title("Baixar vídeos e áudios")
 
     #conteudo do frame baixar:
     title = customtkinter.CTkLabel(paginaBaixar, text = 'Cole o link do vídeo aqui:', text_color='white')
     title.pack(padx = 10, pady = 10)
-    linkEntry = customtkinter.CTkEntry(paginaBaixar, text_color= 'white', fg_color='#4d0511', border_color='white', border_width = 1, width=300, textvariable=linkStr)
+    getLink = tkinter.StringVar()
+    linkEntry = customtkinter.CTkEntry(paginaBaixar, text_color= 'white', fg_color='#4d0511', border_color='white', border_width = 1, width=300, textvariable=getLink)
     linkEntry.pack(padx = 10, pady = (1, 10))
-    download = customtkinter.CTkButton(paginaBaixar, text = 'Fazer Download', command =funcaoDownload(), text_color='white', fg_color='#6e0818', hover_color='#4d0511')
-    download.pack(padx = 10, pady = 10)
-
-    
+    downloadV = customtkinter.CTkButton(paginaBaixar, text = 'Download Vídeo', text_color='white', fg_color='#6e0818', hover_color='#4d0511', command=lambda: baixarVideo(linkEntry))
+    downloadV.pack(padx = 10, pady = 10)
+    downloadA = customtkinter.CTkButton(paginaBaixar, text = 'Download Áudio', text_color='white', fg_color='#6e0818', hover_color='#4d0511', command=lambda: baixarAudio(linkEntry))
+    downloadA.pack(padx = 10, pady = 10)
 
     #fazer o frame paginaInicial nao fechar instantaneamente:
     paginaBaixar.mainloop()
 
-def funcaoDownload():
-    link = linkStr.get()
-    print(link)
 
 #criacao do frame paginaInicial:
 #customtkinter.set_appearance_mode("System")
